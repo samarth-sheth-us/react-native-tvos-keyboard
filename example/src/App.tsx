@@ -1,10 +1,17 @@
-import { StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { TvosKeyboardView } from 'react-native-tvos-keyboard';
 
 export default function App() {
+  const [value, setValue] = useState('');
+
   return (
     <View style={styles.container}>
-      <TvosKeyboardView color="#32a852" style={styles.box} />
+      <TvosKeyboardView
+        onTextChange={(e) => setValue(e.nativeEvent.text)}
+        style={styles.keyboard}
+      />
+      <Text style={styles.text}>Typed: {value}</Text>
     </View>
   );
 }
@@ -12,12 +19,17 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: '#000',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+  keyboard: {
+    width: 1,
+    height: 1,
+  },
+  text: {
+    marginTop: 20,
+    color: 'white',
+    fontSize: 18,
   },
 });

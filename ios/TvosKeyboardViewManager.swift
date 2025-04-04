@@ -1,36 +1,55 @@
+import UIKit
+
 @objc(TvosKeyboardViewManager)
 class TvosKeyboardViewManager: RCTViewManager {
-
-  override func view() -> (TvosKeyboardView) {
+  override func view() -> UIView {
     return TvosKeyboardView()
   }
 
   @objc override static func requiresMainQueueSetup() -> Bool {
-    return false
+    return true // Needs to be true to present UI from main thread
   }
 }
 
-class TvosKeyboardView : UIView {
+class TvosKeyboardView: UIView, UISearchResultsUpdating {
 
-  @objc var color: String = "" {
-    didSet {
-      self.backgroundColor = hexStringToUIColor(hexColor: color)
+  private var searchController: UISearchController?
+  private var parentVC: UIViewController?
+
+  @objc var onTextChange: RCTBubblingEventBlock?
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    DispatchQueue.main.async {
+      self.showSearchController()
     }
   }
 
-  func hexStringToUIColor(hexColor: String) -> UIColor {
-    let stringScanner = Scanner(string: hexColor)
-
-    if(hexColor.hasPrefix("#")) {
-      stringScanner.scanLocation = 1
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+    DispatchQueue.main.async {
+      self.showSearchController()
     }
-    var color: UInt32 = 0
-    stringScanner.scanHexInt32(&color)
+  }
 
-    let r = CGFloat(Int(color >> 16) & 0x000000FF)
-    let g = CGFloat(Int(color >> 8) & 0x000000FF)
-    let b = CGFloat(Int(color) & 0x000000FF)
+  private func showSearchController() {
+    guard let topVC = UIApplication.shared.keyWindow?.rootViewController else {
+      return
+    }
 
-    return UIColor(red: r / 255.0, green: g / 255.0, blue: b / 255.0, alpha: 1)
+    parentVC = topVC
+
+    let dummyResultsVC = UIViewController()
+    searchController = UISearchController(searchResultsController: dummyResultsVC)
+    searchController?.searchResultsUpdater = self
+    searchController?.obscuresBackgroundDuringPresentation = false
+    searchController?.searchBar.placeholder = "Enter keyword"
+
+    parentVC?.present(searchController!, animated: true, completion: nil)
+  }
+
+  func updateSearchResults(for searchController: UISearchController) {
+    let text = searchController.searchBar.text ?? ""
+    onTextChange?(["text": text])
   }
 }

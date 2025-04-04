@@ -12,8 +12,8 @@ const LINKING_ERROR =
   '- You are not using Expo Go\n';
 
 type TvosKeyboardProps = {
-  color: string;
-  style: ViewStyle;
+  style?: ViewStyle;
+  onTextChange?: (event: { nativeEvent: { text: string } }) => void;
 };
 
 const ComponentName = 'TvosKeyboardView';
