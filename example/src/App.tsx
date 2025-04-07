@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   findNodeHandle,
   UIManager,
@@ -11,6 +11,7 @@ import {
 import { TvosKeyboardView } from 'react-native-tvos-keyboard';
 
 export default function App() {
+  const [text, setText] = useState('');
   const keyboardRef = useRef(null);
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.text}>Text: {text}</Text>
       {/* Top Button */}
       <TouchableOpacity
         style={styles.button}
@@ -44,7 +46,7 @@ export default function App() {
       <TvosKeyboardView
         ref={keyboardRef}
         style={styles.keyboard}
-        onTextChange={(e) => console.log('Typed:', e.nativeEvent.text)}
+        onTextChange={(e) => setText(e.nativeEvent.text)}
       />
 
       {/* Bottom Button */}
@@ -67,10 +69,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  text: {
+    color: '#fff',
+    fontSize: 22,
+    marginBottom: 20,
+  },
   keyboard: {
     width: '100%',
-    height: 500,
-    marginVertical: 30,
+    height: 200,
     backgroundColor: 'transparent',
   },
   button: {
