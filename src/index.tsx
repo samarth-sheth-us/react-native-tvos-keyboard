@@ -8,12 +8,22 @@ import {
 } from 'react-native';
 import React, { forwardRef } from 'react';
 
+type OnFocusEvent = NativeSyntheticEvent<{
+  focused: boolean;
+}>;
+
+type OnBlurEvent = NativeSyntheticEvent<{
+  blurred: boolean;
+}>;
+
 type OnTextChangeEvent = NativeSyntheticEvent<{
   text: string;
 }>;
 
 export type TvosKeyboardProps = ViewProps & {
   onTextChange?: (event: OnTextChangeEvent) => void;
+  onFocus?: (event: OnFocusEvent) => void;
+  onBlur?: (event: OnBlurEvent) => void;
   style?: ViewStyle;
 };
 

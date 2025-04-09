@@ -13,6 +13,7 @@ import { TvosKeyboardView } from 'react-native-tvos-keyboard';
 export default function App() {
   const [text, setText] = useState('');
   const keyboardRef = useRef(null);
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     const tag = findNodeHandle(keyboardRef.current);
@@ -31,6 +32,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Text: {text}</Text>
+      <Text style={styles.text}>isFocused: {focused ? 'true' : 'false'}</Text>
       {/* Top Button */}
       <TouchableOpacity
         style={styles.button}
@@ -47,6 +49,18 @@ export default function App() {
         ref={keyboardRef}
         style={styles.keyboard}
         onTextChange={(e) => setText(e.nativeEvent.text)}
+        onFocus={(e) => {
+          // console.log('Keyboard focused:', e.nativeEvent.focused);
+          if (e.nativeEvent.focused !== undefined && e.nativeEvent.focused) {
+            setFocused(true);
+          }
+        }}
+        onBlur={(e) => {
+          // console.log('Keyboard blurred:', e.nativeEvent.blurred);
+          if (e.nativeEvent.blurred !== undefined && e.nativeEvent.blurred) {
+            setFocused(false);
+          }
+        }}
       />
 
       {/* Bottom Button */}

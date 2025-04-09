@@ -21,12 +21,14 @@ class TvosKeyboardViewManager: RCTViewManager {
   }
 }
 
-class TvosKeyboardView: UIView, UISearchResultsUpdating {
+class TvosKeyboardView: UIView, UISearchResultsUpdating, UISearchBarDelegate {
 
   private var searchController: UISearchController!
   private var containerVC: UISearchContainerViewController!
 
   @objc var onTextChange: RCTBubblingEventBlock?
+  @objc var onFocus: RCTBubblingEventBlock?
+  @objc var onBlur: RCTBubblingEventBlock?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -39,11 +41,9 @@ class TvosKeyboardView: UIView, UISearchResultsUpdating {
   }
 
   private func setupSearchController() {
-    // Dummy results VC, just required by UISearchController
     let resultsVC = UIViewController()
     resultsVC.view.backgroundColor = .clear
 
-    // Create search controller
     searchController = UISearchController(searchResultsController: resultsVC)
     searchController.searchResultsUpdater = self
     searchController.obscuresBackgroundDuringPresentation = false
@@ -51,7 +51,9 @@ class TvosKeyboardView: UIView, UISearchResultsUpdating {
     searchController.automaticallyShowsCancelButton = false
     searchController.searchBar.placeholder = "Enter keyword"
 
-    // Embed search controller in container
+    // Add delegate to detect focus
+    searchController.searchBar.delegate = self
+
     containerVC = UISearchContainerViewController(searchController: searchController)
     containerVC.view.translatesAutoresizingMaskIntoConstraints = false
     containerVC.view.clipsToBounds = true
@@ -59,7 +61,6 @@ class TvosKeyboardView: UIView, UISearchResultsUpdating {
     self.addSubview(containerVC.view)
     self.clipsToBounds = true
 
-    // Pin to edges
     NSLayoutConstraint.activate([
       containerVC.view.topAnchor.constraint(equalTo: self.topAnchor),
       containerVC.view.bottomAnchor.constraint(equalTo: self.bottomAnchor),
@@ -68,16 +69,22 @@ class TvosKeyboardView: UIView, UISearchResultsUpdating {
     ])
   }
 
-  // Allow JS to call this and focus the search bar (which triggers keyboard)
   func focusSearchBar() {
     DispatchQueue.main.async {
       self.searchController.searchBar.becomeFirstResponder()
     }
   }
 
-  // Called as user types
   func updateSearchResults(for searchController: UISearchController) {
     let text = searchController.searchBar.text ?? ""
     onTextChange?(["text": text])
+  }
+
+  func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+    onFocus?(["focused": true])
+  }
+
+  func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+    onBlur?(["blurred": true])
   }
 }
