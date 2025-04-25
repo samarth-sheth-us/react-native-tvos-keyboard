@@ -50,13 +50,11 @@ export default function App() {
         style={styles.keyboard}
         onTextChange={(e) => setText(e.nativeEvent.text)}
         onFocus={(e) => {
-          // console.log('Keyboard focused:', e.nativeEvent.focused);
           if (e.nativeEvent.focused !== undefined && e.nativeEvent.focused) {
             setFocused(true);
           }
         }}
         onBlur={(e) => {
-          // console.log('Keyboard blurred:', e.nativeEvent.blurred);
           if (e.nativeEvent.blurred !== undefined && e.nativeEvent.blurred) {
             setFocused(false);
           }

@@ -11,7 +11,6 @@ class TvosKeyboardViewManager: RCTViewManager {
     return true
   }
 
-  // Expose focus method to JS
   @objc func focusSearchBar(_ reactTag: NSNumber) {
     DispatchQueue.main.async {
       if let view = self.bridge.uiManager.view(forReactTag: reactTag) as? TvosKeyboardView {
@@ -25,6 +24,8 @@ class TvosKeyboardView: UIView, UISearchResultsUpdating, UISearchBarDelegate {
 
   private var searchController: UISearchController!
   private var containerVC: UISearchContainerViewController!
+  private let searchResultsController = UICollectionViewController(collectionViewLayout: UICollectionViewFlowLayout())
+
 
   @objc var onTextChange: RCTBubblingEventBlock?
   @objc var onFocus: RCTBubblingEventBlock?
@@ -50,6 +51,11 @@ class TvosKeyboardView: UIView, UISearchResultsUpdating, UISearchBarDelegate {
     searchController.hidesNavigationBarDuringPresentation = false
     searchController.automaticallyShowsCancelButton = false
     searchController.searchBar.placeholder = "Enter keyword"
+      
+    if #available(tvOS 14.0, *) {
+      searchController.searchControllerObservedScrollView = searchResultsController.collectionView
+      searchController.searchSuggestions = nil
+    }
 
     // Add delegate to detect focus
     searchController.searchBar.delegate = self
@@ -71,6 +77,7 @@ class TvosKeyboardView: UIView, UISearchResultsUpdating, UISearchBarDelegate {
 
   func focusSearchBar() {
     DispatchQueue.main.async {
+      self.searchController.searchSuggestions = nil
       self.searchController.searchBar.becomeFirstResponder()
     }
   }
